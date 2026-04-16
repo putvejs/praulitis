@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="lv">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Folkloras kopa "Praulītis"{% endblock %}</title>
+  <meta name="description" content="{% block meta_desc %}Praulienas pagasta folkloras kopa — tradicionālā dziedāšana, tautas deja un mūzika.{% endblock %}">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/main.css">
+  <link rel="icon" href="/static/img/favicon.svg" type="image/svg+xml">
+  {% block extra_head %}{% endblock %}
+</head>
+<body class="{% block body_class %}{% endblock %}">
+
+<nav id="site-nav" role="navigation" aria-label="Galvenā navigācija">
+  <a class="nav-logo" href="/">
+    <span class="nav-rune">✦</span> Praulītis
+  </a>
+
+  <div class="nav-links">
+    <a href="/">Sākums</a>
+    <a href="/events">Pasākumi</a>
+    <a href="/gallery">Galerija</a>
+    <a href="/about">Par mums</a>
+    <a href="/media">Mediji</a>
+    {% if session.user_id %}
+      <a href="/member">Dalībnieki</a>
+      {% if session.role == 'admin' %}
+        <a href="/admin">Admin</a>
+      {% endif %}
+      <a href="/logout" class="nav-action-btn logout">Iziet</a>
+    {% else %}
+      <a href="/login" class="nav-action-btn">Ieiet</a>
+    {% endif %}
+  </div>
+
+  <button class="nav-hamburger" id="navHamburger" aria-label="Izvēlne">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- Mobile nav -->
+<div class="nav-mobile hidden" id="navMobile">
+  <a href="/">Sākums</a>
+  <a href="/events">Pasākumi</a>
+  <a href="/gallery">Galerija</a>
+  <a href="/about">Par mums</a>
+  <a href="/media">Mediji</a>
+  {% if session.user_id %}
+    <a href="/member">Dalībnieki</a>
+    {% if session.role == 'admin' %}
+      <a href="/admin">Admin</a>
+    {% endif %}
+    <a href="/logout" class="nav-action-btn logout">Iziet</a>
+  {% else %}
+    <a href="/login" class="nav-action-btn">Ieiet</a>
+  {% endif %}
+</div>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="flashes">
+      {% for category, message in messages %}
+        <div class="flash {{ category }}">{{ message }}</div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+
+<main class="site-main">
+  {% block content %}{% endblock %}
+</main>
+
+<footer class="site-footer">
+  <div class="footer-folk-divider">✦ ✦ ✦ ✦ ✦</div>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <div class="footer-logo"><em>Praulītis</em></div>
+      <div class="footer-tagline">Folkloras kopa no Praulienas — kopjam senās dziedāšanas tradīcijas jau vairākus gadu desmitus.</div>
+      <div class="footer-social">
+        <a class="social-btn" href="#" aria-label="Facebook">f</a>
+        <a class="social-btn" href="#" aria-label="YouTube">▶</a>
+      </div>
+    </div>
+    <div class="footer-col">
+      <h4>Lapas</h4>
+      <a href="/events">Pasākumi</a>
+      <a href="/gallery">Galerija</a>
+      <a href="/about">Par mums</a>
+      <a href="/media">Mediji</a>
+    </div>
+    <div class="footer-col">
+      <h4>Dalībnieki</h4>
+      <a href="/member">Dalībnieku zona</a>
+      <a href="/member/schedule">Mēģinājumi</a>
+      <a href="/login">Ieiet</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>Prauliena · Madonas novads · Latvija</span>
+    <span>© {{ now().year }} Folkloras kopa "Praulītis"</span>
+  </div>
+</footer>
+
+<!-- Lightbox -->
+<div id="lightbox" class="lightbox-overlay hidden" role="dialog" aria-label="Foto skatītājs">
+  <button class="lightbox-close" aria-label="Aizvērt">×</button>
+  <button class="lightbox-nav prev" aria-label="Iepriekšējais">&#8249;</button>
+  <img class="lightbox-img" src="" alt="">
+  <div class="lightbox-caption"></div>
+  <button class="lightbox-nav next" aria-label="Nākamais">&#8250;</button>
+</div>
+
+<script src="/static/js/main.js"></script>
+{% block extra_scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}Pasākumi — Praulītis{% endblock %}
+
+{% macro event_row(e) %}
+{% set parts = e.event_date.split('-') %}
+{% set months = ['Jan','Feb','Mar','Apr','Mai','Jūn','Jūl','Aug','Sep','Okt','Nov','Dec'] %}
+<a href="/events/{{ e.slug }}" class="event-row fade-in">
+  <div class="event-date">
+    <div class="event-day">{{ parts[2] }}</div>
+    <div class="event-month">{{ months[parts[1]|int - 1] }} {{ parts[0] }}</div>
+  </div>
+  <div class="event-info">
+    <div class="event-title">
+      {{ e.title }}
+      <span class="event-type type-{{ e.event_type }}" style="font-size:10px;vertical-align:middle;margin-left:8px">{{ e.event_type }}</span>
+    </div>
+    {% if e.location or e.event_time %}
+    <div class="event-location">
+      {% if e.event_time %}{{ e.event_time }}{% if e.location %} · {% endif %}{% endif %}
+      {% if e.location %}{{ e.location }}{% endif %}
+    </div>
+    {% endif %}
+    {% if e.description %}
+    <div style="font-size:12px;color:rgba(245,232,200,.35);margin-top:6px">
+      {{ e.description[:120] }}{% if e.description|length > 120 %}…{% endif %}
+    </div>
+    {% endif %}
+  </div>
+  <span class="event-ticket-btn">Uzzināt vairāk →</span>
+</a>
+{% endmacro %}
+
+{% block content %}
+<!-- ─── Upcoming events ─── -->
+<section class="events-section">
+  <div class="section-header">
+    <div>
+      <div class="section-label">Koncerti un svētki</div>
+      <h2 class="section-title">Gaidāmie <em>pasākumi</em></h2>
+    </div>
+    {% if upcoming %}
+    <div class="section-count">{{ '%02d'|format(upcoming|length) }}</div>
+    {% endif %}
+  </div>
+
+  {% if upcoming %}
+  <div class="events-list">
+    {% for e in upcoming %}{{ event_row(e) }}{% endfor %}
+  </div>
+  {% else %}
+  <p style="color:rgba(245,232,200,.4);font-size:15px">Pašlaik nav plānotu publisko pasākumu.</p>
+  {% endif %}
+</section>
+
+<!-- ─── Past events ─── -->
+{% if past %}
+<section class="events-section" style="background:var(--charcoal)">
+  <div class="section-header">
+    <div>
+      <div class="section-label" style="color:var(--stone)">Vēsture</div>
+      <h2 class="section-title">Iepriekšējie <em>pasākumi</em></h2>
+    </div>
+    <div class="section-count" style="color:rgba(255,255,255,.04)">{{ '%02d'|format(past|length) }}</div>
+  </div>
+  <div class="events-list">
+    {% for e in past %}{{ event_row(e) }}{% endfor %}
+  </div>
+</section>
+{% endif %}
+{% endblock %}

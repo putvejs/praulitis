@@ -1,0 +1,73 @@
+{% extends "admin/base.html" %}
+{% block title %}Mediji — Admin{% endblock %}
+
+{% block admin_content %}
+<div class="admin-header"><h1>Mediji</h1></div>
+
+<div class="card card-body" style="margin-bottom:2rem">
+  <h3 style="margin-bottom:1rem">Pievienot mediju</h3>
+  <form method="POST" action="/admin/media/new" enctype="multipart/form-data">
+    <div class="grid-2" style="gap:1rem">
+      <div class="form-group">
+        <label class="form-label">Nosaukums *</label>
+        <input type="text" name="title" class="form-control" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Veids</label>
+        <select name="media_type" class="form-control">
+          <option value="video">Video</option>
+          <option value="audio">Audio</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">YouTube saite (vai augšupielādēt failu)</label>
+        <input type="url" name="youtube_url" class="form-control" placeholder="https://youtube.com/watch?v=...">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Fails (video/audio)</label>
+        <input type="file" name="file" class="form-control" accept="video/*,audio/*">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Sīktēls (foto)</label>
+        <input type="file" name="thumbnail" class="form-control" accept="image/*">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Piesaistīt pasākumam</label>
+        <select name="event_id" class="form-control">
+          <option value="">—</option>
+          {% for e in events_list %}<option value="{{ e.id }}">{{ e.title }}</option>{% endfor %}
+        </select>
+      </div>
+      <div class="form-group" style="grid-column:1/-1">
+        <label class="form-label">Apraksts</label>
+        <textarea name="description" class="form-control" rows="2"></textarea>
+      </div>
+      <div><label class="form-check"><input type="checkbox" name="is_public" checked> Publisks</label></div>
+    </div>
+    <button type="submit" class="btn btn-primary mt-2">Saglabāt</button>
+  </form>
+</div>
+
+<div class="table-responsive">
+  <table class="table">
+    <thead><tr><th>Veids</th><th>Nosaukums</th><th>Pasākums</th><th>Publisks</th><th>Darbības</th></tr></thead>
+    <tbody>
+      {% for m in media_items %}
+      <tr>
+        <td>{{ '🎬' if m.media_type == 'video' else '🎵' }}</td>
+        <td>{{ m.title }}{% if m.youtube_url %} <a href="{{ m.youtube_url }}" target="_blank" style="font-size:.75rem">YT↗</a>{% endif %}</td>
+        <td>{{ m.event_title or '—' }}</td>
+        <td>{{ '✅' if m.is_public else '🔒' }}</td>
+        <td>
+          <form method="POST" action="/admin/media/{{ m.id }}/delete" onsubmit="return confirm('Dzēst?')">
+            <button class="btn btn-sm btn-danger">Dzēst</button>
+          </form>
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="5" class="text-muted" style="text-align:center;padding:2rem">Nav mediju.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

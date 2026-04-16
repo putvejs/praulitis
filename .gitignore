@@ -1,0 +1,17 @@
+.env
+.env.*
+!.env.example
+data/
+app/static/uploads/photos/
+app/static/uploads/videos/
+app/static/uploads/audio/
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+.DS_Store
+*.sqlite
+*.db
+frontend/node_modules/
+frontend_dist/

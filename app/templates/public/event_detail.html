@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block title %}{{ event.title }} — Praulītis{% endblock %}
+{% block meta_desc %}{{ event.description[:160] if event.description else event.title }}{% endblock %}
+
+{% block content %}
+{% set parts = event.event_date.split('-') %}
+{% set months = ['Janvāris','Februāris','Marts','Aprīlis','Maijs','Jūnijs','Jūlijs','Augusts','Septembris','Oktobris','Novembris','Decembris'] %}
+
+<section class="section" style="padding-top:2rem">
+  <div class="container" style="max-width:800px">
+    <p style="margin-bottom:1rem"><a href="/events">← Atpakaļ uz pasākumiem</a></p>
+
+    <div style="display:flex;gap:1.5rem;align-items:flex-start;flex-wrap:wrap">
+      <div class="event-date-block" style="border-radius:var(--radius);flex-shrink:0">
+        <span class="day">{{ parts[2] }}</span>
+        <span class="month">{{ months[parts[1]|int - 1][:3] }}</span>
+        <span class="year">{{ parts[0] }}</span>
+      </div>
+      <div>
+        <span class="event-type type-{{ event.event_type }}">{{ event.event_type }}</span>
+        <h1 style="margin-top:.5rem">{{ event.title }}</h1>
+        <div class="event-meta" style="font-size:.95rem;margin-top:.5rem">
+          {% if event.event_time %}<span>🕐 {{ event.event_time }}</span>{% endif %}
+          {% if event.location %}<span>📍 {{ event.location }}</span>{% endif %}
+          {% if event.end_date and event.end_date != event.event_date %}<span>līdz {{ event.end_date }}</span>{% endif %}
+        </div>
+      </div>
+    </div>
+
+    {% if event.description %}
+    <div style="margin-top:2rem;line-height:1.8">
+      {{ event.description | replace('\n', '<br>') | safe }}
+    </div>
+    {% endif %}
+
+    {% if photos %}
+    <hr class="divider">
+    <h2>Fotogrāfijas</h2>
+    <div class="photo-grid" style="margin-top:1rem">
+      {% for photo in photos %}
+      <div class="photo-item" data-src="{{ photo.url or '/static/uploads/photos/' ~ photo.filename }}" data-caption="{{ photo.caption or '' }}">
+        <img src="{{ photo.url or '/static/uploads/photos/' ~ photo.filename }}" alt="{{ photo.caption or 'Foto' }}" loading="lazy">
+        <div class="photo-overlay">
+          {% if photo.caption %}<span>{{ photo.caption }}</span>{% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if videos %}
+    <hr class="divider">
+    <h2>Video</h2>
+    <div class="grid-2" style="margin-top:1rem">
+      {% for v in videos %}
+      <div class="card">
+        {% if v.youtube_url %}
+        {% set yt_id = v.youtube_url.split('v=')[-1].split('&')[0] if 'v=' in v.youtube_url else v.youtube_url.split('/')[-1] %}
+        <div style="aspect-ratio:16/9">
+          <iframe width="100%" height="100%" src="https://www.youtube.com/embed/{{ yt_id }}" frameborder="0" allowfullscreen></iframe>
+        </div>
+        {% elif v.filename %}
+        <video controls style="width:100%;aspect-ratio:16/9">
+          <source src="{{ v.url or '/static/uploads/videos/' ~ v.filename }}">
+        </video>
+        {% endif %}
+        <div class="card-body">
+          <div class="card-title">{{ v.title }}</div>
+          {% if v.description %}<p style="font-size:.85rem;color:var(--ink-light)">{{ v.description }}</p>{% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const items = Array.from(document.querySelectorAll('.photo-item')).map(el => ({
+      src: el.dataset.src, caption: el.dataset.caption
+    }));
+    if (typeof initGallery === 'function') initGallery(items);
+  });
+</script>
+{% endblock %}

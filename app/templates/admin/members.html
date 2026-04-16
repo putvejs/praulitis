@@ -1,0 +1,34 @@
+{% extends "admin/base.html" %}
+{% block title %}Dalībnieki — Admin{% endblock %}
+
+{% block admin_content %}
+<div class="admin-header">
+  <h1>Dalībnieki</h1>
+  <a href="/admin/members/new" class="btn btn-primary">+ Jauns dalībnieks</a>
+</div>
+<div class="table-responsive">
+  <table class="table">
+    <thead><tr><th>Foto</th><th>Vārds</th><th>Loma</th><th>Aktīvs</th><th>Darbības</th></tr></thead>
+    <tbody>
+      {% for m in members %}
+      <tr>
+        <td>{% if m.photo_filename %}<img src="/static/uploads/photos/{{ m.photo_filename }}" style="width:40px;height:40px;border-radius:50%;object-fit:cover">{% else %}👤{% endif %}</td>
+        <td>{{ m.name }}</td>
+        <td>{{ m.role or '—' }}</td>
+        <td>{{ '✅' if m.is_active else '—' }}</td>
+        <td>
+          <div style="display:flex;gap:.25rem">
+            <a href="/admin/members/{{ m.id }}/edit" class="btn btn-sm btn-ghost">Rediģēt</a>
+            <form method="POST" action="/admin/members/{{ m.id }}/delete" onsubmit="return confirm('Dzēst?')">
+              <button class="btn btn-sm btn-danger">Dzēst</button>
+            </form>
+          </div>
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="5" class="text-muted" style="text-align:center;padding:2rem">Nav dalībnieku.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

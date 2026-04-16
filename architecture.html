@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Praulitis — Architecture</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: #0f1117; color: #e2e8f0; min-height: 100vh; padding: 40px 24px; }
+  h1 { text-align: center; font-size: 22px; font-weight: 600; color: #f7e8c8; letter-spacing: 1px; margin-bottom: 8px; }
+  .subtitle { text-align: center; font-size: 12px; color: #64748b; margin-bottom: 48px; letter-spacing: 2px; text-transform: uppercase; }
+
+  .diagram { max-width: 1100px; margin: 0 auto; display: flex; flex-direction: column; gap: 32px; }
+
+  /* ── row layouts ── */
+  .row { display: flex; align-items: stretch; gap: 16px; justify-content: center; }
+  .row.wide { flex-wrap: wrap; }
+
+  /* ── boxes ── */
+  .box {
+    border-radius: 10px; padding: 16px 20px; min-width: 140px;
+    border: 1px solid rgba(255,255,255,.08);
+    position: relative; flex-shrink: 0;
+  }
+  .box .label { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 6px; opacity: .6; }
+  .box .name { font-size: 14px; font-weight: 600; line-height: 1.3; }
+  .box .detail { font-size: 11px; color: #94a3b8; margin-top: 5px; line-height: 1.5; }
+
+  /* colours */
+  .c-user    { background: #1e2a3a; border-color: #3b82f6; }
+  .c-user .name { color: #93c5fd; }
+  .c-cf      { background: #2a1e10; border-color: #f97316; }
+  .c-cf .name { color: #fdba74; }
+  .c-caddy   { background: #1a2410; border-color: #84cc16; }
+  .c-caddy .name { color: #bef264; }
+  .c-flask   { background: #1e1a2e; border-color: #a855f7; }
+  .c-flask .name { color: #d8b4fe; }
+  .c-react   { background: #102030; border-color: #06b6d4; }
+  .c-react .name { color: #67e8f9; }
+  .c-s3      { background: #1e2510; border-color: #eab308; }
+  .c-s3 .name { color: #fde047; }
+  .c-db      { background: #1a1a2e; border-color: #6366f1; }
+  .c-db .name { color: #a5b4fc; }
+  .c-ffmpeg  { background: #2a1018; border-color: #f43f5e; }
+  .c-ffmpeg .name { color: #fda4af; }
+  .c-docker  { background: #0f1e2e; border-color: #0ea5e9; }
+  .c-docker .name { color: #7dd3fc; }
+  .c-hlsjs   { background: #102820; border-color: #10b981; }
+  .c-hlsjs .name { color: #6ee7b7; }
+
+  /* ── arrows / connectors ── */
+  .arrow-col { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; }
+  .arrow-row { display: flex; align-items: center; justify-content: center; gap: 2px; }
+  .arr { color: #475569; font-size: 18px; line-height: 1; }
+  .arr-label { font-size: 10px; color: #475569; text-align: center; white-space: nowrap; }
+
+  /* ── section dividers ── */
+  .section-title {
+    text-align: center; font-size: 10px; font-weight: 700; letter-spacing: 2px;
+    text-transform: uppercase; color: #334155; margin-bottom: -16px;
+  }
+
+  /* ── flow numbers ── */
+  .badge {
+    display: inline-block; width: 18px; height: 18px; border-radius: 50%;
+    font-size: 10px; font-weight: 700; text-align: center; line-height: 18px;
+    margin-right: 5px; flex-shrink: 0;
+  }
+  .badge.blue  { background: #1d4ed8; color: #bfdbfe; }
+  .badge.green { background: #15803d; color: #bbf7d0; }
+  .badge.red   { background: #9f1239; color: #fecdd3; }
+
+  /* ── legend ── */
+  .legend {
+    max-width: 1100px; margin: 8px auto 0;
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 8px;
+  }
+  .legend-item {
+    background: #161b22; border: 1px solid #1e293b; border-radius: 8px;
+    padding: 10px 14px; display: flex; align-items: flex-start; gap: 10px; font-size: 12px;
+  }
+  .legend-item .num { font-weight: 700; color: #64748b; min-width: 22px; }
+  .legend-item .text { color: #94a3b8; line-height: 1.5; }
+  .legend-item .text strong { color: #cbd5e1; }
+
+  /* ── server box ── */
+  .server-wrap {
+    border: 1px dashed #334155; border-radius: 12px; padding: 16px;
+    position: relative;
+  }
+  .server-wrap .server-label {
+    position: absolute; top: -10px; left: 16px;
+    background: #0f1117; padding: 0 8px;
+    font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: #475569;
+  }
+</style>
+</head>
+<body>
+
+<h1>🎵 Praulitis — System Architecture</h1>
+<div class="subtitle">praulits.madonai.lv · Flask + React + S3 + HLS · Home Server</div>
+
+<div class="diagram">
+
+  <!-- ── Row 1: User & CDN layer ── -->
+  <div class="row">
+    <div class="box c-user">
+      <div class="label">Client</div>
+      <div class="name">Browser</div>
+      <div class="detail">Visitor / Admin<br>hls.js player</div>
+    </div>
+    <div class="arrow-col">
+      <div class="arr">→</div>
+      <div class="arr-label">HTTPS</div>
+    </div>
+    <div class="box c-cf">
+      <div class="label">Cloudflare</div>
+      <div class="name">CF Tunnel</div>
+      <div class="detail">SSL termination<br>100 MB upload limit<br>DDoS protection</div>
+    </div>
+    <div class="arrow-col">
+      <div class="arr">→</div>
+      <div class="arr-label">HTTP</div>
+    </div>
+    <div class="box c-caddy">
+      <div class="label">Reverse Proxy</div>
+      <div class="name">Caddy</div>
+      <div class="detail">praulits.madonai.lv<br>gzip + security headers<br>→ localhost:5002</div>
+    </div>
+  </div>
+
+  <div class="arrow-col">
+    <div class="arr">↓</div>
+  </div>
+
+  <!-- ── Row 2: Server ── -->
+  <div class="server-wrap">
+    <div class="server-label">🖥 Home Server · Docker</div>
+    <div class="row wide" style="justify-content:space-around;gap:24px;">
+
+      <div class="box c-flask" style="min-width:200px;">
+        <div class="label">Backend</div>
+        <div class="name">Flask + Waitress</div>
+        <div class="detail">
+          <b>Public API</b> /api/*<br>
+          <b>Admin API</b> /api/admin/*<br>
+          <b>Auth</b> sessions + roles<br>
+          <b>SPA</b> serves React builds<br>
+          port 5002
+        </div>
+      </div>
+
+      <div class="arrow-col"><div class="arr">↔</div></div>
+
+      <div class="box c-db" style="min-width:160px;">
+        <div class="label">Database</div>
+        <div class="name">SQLite</div>
+        <div class="detail">
+          users, events<br>
+          media (hls_path,<br>
+          hls_status,<br>
+          duration_sec)<br>
+          gallery, members
+        </div>
+      </div>
+
+      <div class="arrow-col"><div class="arr">↔</div></div>
+
+      <div class="box c-ffmpeg" style="min-width:180px;">
+        <div class="label">Background Thread</div>
+        <div class="name">FFmpeg Processor</div>
+        <div class="detail">
+          Download MP4 from S3<br>
+          Encode 360p / 720p / 1080p<br>
+          Segment → HLS .ts chunks<br>
+          Extract thumbnail @ 2s<br>
+          Upload HLS tree → S3<br>
+          Update DB hls_status
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="arrow-col">
+    <div class="arr">↕</div>
+    <div class="arr-label">S3 API</div>
+  </div>
+
+  <!-- ── Row 3: S3 ── -->
+  <div class="row">
+    <div class="box c-s3" style="min-width:480px;">
+      <div class="label">AWS S3 · praulits-media (us-east-1) · CORS: GET HEAD PUT *</div>
+      <div class="name">Object Storage</div>
+      <div class="detail" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:8px;">
+        <div>
+          <div style="color:#fde047;font-weight:600;margin-bottom:4px;">photos/</div>
+          gallery images<br>member photos<br>thumbnails<br>event covers
+        </div>
+        <div>
+          <div style="color:#fde047;font-weight:600;margin-bottom:4px;">videos/</div>
+          original MP4<br>MOV · WEBM<br><br>← direct S3 upload<br>(bypasses CF)
+        </div>
+        <div>
+          <div style="color:#fde047;font-weight:600;margin-bottom:4px;">hls/{id}/</div>
+          master.m3u8<br>360p/playlist.m3u8<br>720p/playlist.m3u8<br>1080p/playlist.m3u8<br>seg*.ts chunks
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="height:8px;"></div>
+
+  <!-- ── Row 4: Frontend ── -->
+  <div class="row wide">
+    <div class="box c-react" style="min-width:200px;">
+      <div class="label">Public SPA</div>
+      <div class="name">Praulitis.jsx</div>
+      <div class="detail">
+        Single React file<br>
+        Members · Events · Gallery<br>
+        Audio player · Video grid<br>
+        #video-{id} deep links
+      </div>
+    </div>
+
+    <div class="arrow-col"><div class="arr" style="font-size:14px;">↔</div></div>
+
+    <div class="box c-hlsjs" style="min-width:180px;">
+      <div class="label">Video Player</div>
+      <div class="name">hls.js</div>
+      <div class="detail">
+        Fetches master.m3u8<br>
+        Auto quality (startLevel -1)<br>
+        360p ↔ 720p ↔ 1080p<br>
+        Safari: native HLS<br>
+        Fallback: direct MP4
+      </div>
+    </div>
+
+    <div class="arrow-col"><div class="arr" style="font-size:14px;">↔</div></div>
+
+    <div class="box c-react" style="min-width:200px;">
+      <div class="label">Admin SPA</div>
+      <div class="name">AdminApp.jsx</div>
+      <div class="detail">
+        Media · Gallery · Events<br>
+        Members · Content<br>
+        HLS status indicator<br>
+        Presigned upload flow
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ── Upload flow legend ── -->
+<div style="max-width:1100px;margin:40px auto 0;">
+  <div class="section-title" style="margin-bottom:16px;">📤 Video Upload Flow</div>
+  <div class="legend">
+    <div class="legend-item">
+      <div class="num"><span class="badge blue">1</span></div>
+      <div class="text">Admin picks MP4 → browser calls <strong>POST /api/admin/media/presign</strong> → server returns S3 presigned PUT URL + UUID filename</div>
+    </div>
+    <div class="legend-item">
+      <div class="num"><span class="badge blue">2</span></div>
+      <div class="text">Browser <strong>PUT</strong> file directly to S3 with XHR (shows % progress) — <strong>bypasses Cloudflare entirely</strong>, no 100 MB limit</div>
+    </div>
+    <div class="legend-item">
+      <div class="num"><span class="badge blue">3</span></div>
+      <div class="text">Browser <strong>POST /api/admin/media</strong> with title + <code>presigned_filename</code> → Flask saves DB record (hls_status = none)</div>
+    </div>
+    <div class="legend-item">
+      <div class="num"><span class="badge green">4</span></div>
+      <div class="text">Flask spawns daemon thread → <strong>video_processor.trigger()</strong> → downloads MP4 from S3 to /tmp</div>
+    </div>
+    <div class="legend-item">
+      <div class="num"><span class="badge green">5</span></div>
+      <div class="text">ffprobe detects resolution; ffmpeg encodes <strong>360p / 720p / 1080p HLS</strong> (6-second segments, preset fast) + extracts thumbnail @ 2s</div>
+    </div>
+    <div class="legend-item">
+      <div class="num"><span class="badge green">6</span></div>
+      <div class="text">HLS tree + thumbnail uploaded to <strong>S3 hls/{id}/</strong>; DB updated: hls_path, duration_sec, thumbnail_filename, hls_status = done</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Playback flow legend ── -->
+<div style="max-width:1100px;margin:24px auto 40px;">
+  <div class="section-title" style="margin-bottom:16px;">▶ Video Playback Flow</div>
+  <div class="legend">
+    <div class="legend-item">
+      <div class="num"><span class="badge red">1</span></div>
+      <div class="text">Visitor opens page → <strong>GET /api/videos</strong> returns list with <code>hls_url</code> (S3 master.m3u8) + <code>url</code> (direct MP4)</div>
+    </div>
+    <div class="legend-item">
+      <div class="num"><span class="badge red">2</span></div>
+      <div class="text">Click video card → hls.js loads <strong>master.m3u8</strong> from S3, selects quality by measuring download speed</div>
+    </div>
+    <div class="legend-item">
+      <div class="num"><span class="badge red">3</span></div>
+      <div class="text">Browser fetches <strong>.ts segments</strong> directly from S3 (CORS allows GET *); switches 360p ↔ 720p adaptively mid-playback</div>
+    </div>
+    <div class="legend-item">
+      <div class="num"><span class="badge red">4</span></div>
+      <div class="text">URL updates to <strong>#video-{id}</strong> — shareable deep link; copy-link button in modal; Safari uses native HLS; fallback to direct MP4</div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

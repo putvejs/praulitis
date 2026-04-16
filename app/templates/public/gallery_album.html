@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}{{ album }} — Galerija — Praulītis{% endblock %}
+
+{% block content %}
+<section class="section" style="padding-top:2rem">
+  <div class="container">
+    <p style="margin-bottom:1rem"><a href="/gallery">← Atpakaļ uz galeriju</a></p>
+    <h1>{{ album }}</h1>
+    <p class="text-muted">{{ photos|length }} fotogrāfija{{ 's' if photos|length != 1 else '' }}</p>
+
+    <div class="photo-grid" style="margin-top:1.5rem">
+      {% for photo in photos %}
+      <div class="photo-item" data-src="/static/uploads/photos/{{ photo.filename }}" data-caption="{{ photo.caption or '' }}">
+        <img src="/static/uploads/photos/{{ photo.filename }}" alt="{{ photo.caption or 'Foto' }}" loading="lazy">
+        <div class="photo-overlay">
+          {% if photo.caption %}<span>{{ photo.caption }}</span>{% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const items = Array.from(document.querySelectorAll('.photo-item')).map(el => ({
+      src: el.dataset.src, caption: el.dataset.caption
+    }));
+    if (typeof initGallery === 'function') initGallery(items);
+  });
+</script>
+{% endblock %}

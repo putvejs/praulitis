@@ -1,0 +1,38 @@
+{% extends "admin/base.html" %}
+{% block title %}Pasākumi — Admin{% endblock %}
+
+{% block admin_content %}
+<div class="admin-header">
+  <h1>Pasākumi</h1>
+  <a href="/admin/events/new" class="btn btn-primary">+ Jauns pasākums</a>
+</div>
+
+<div class="table-responsive">
+  <table class="table">
+    <thead>
+      <tr><th>Datums</th><th>Nosaukums</th><th>Veids</th><th>Vieta</th><th>Publisks</th><th>Darbības</th></tr>
+    </thead>
+    <tbody>
+      {% for e in events %}
+      <tr>
+        <td style="white-space:nowrap">{{ e.event_date }}</td>
+        <td><a href="/events/{{ e.slug }}" target="_blank">{{ e.title }}</a></td>
+        <td><span class="event-type type-{{ e.event_type }}">{{ e.event_type }}</span></td>
+        <td>{{ e.location or '—' }}</td>
+        <td>{% if e.is_public %}✅{% else %}🔒{% endif %}</td>
+        <td>
+          <div style="display:flex;gap:.25rem">
+            <a href="/admin/events/{{ e.id }}/edit" class="btn btn-sm btn-ghost">Rediģēt</a>
+            <form method="POST" action="/admin/events/{{ e.id }}/delete" onsubmit="return confirm('Dzēst?')">
+              <button type="submit" class="btn btn-sm btn-danger">Dzēst</button>
+            </form>
+          </div>
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="6" class="text-muted" style="text-align:center;padding:2rem">Nav pasākumu.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

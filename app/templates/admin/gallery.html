@@ -1,0 +1,94 @@
+{% extends "admin/base.html" %}
+{% block title %}Galerija — Admin{% endblock %}
+
+{% block admin_content %}
+<div class="admin-header">
+  <h1>Galerija <span class="badge-pending" style="font-size:.8rem">{{ photos|selectattr('is_public','eq',0)|list|length }} neapstiprināti</span></h1>
+</div>
+
+<!-- Upload form -->
+<div class="card card-body" style="margin-bottom:2rem">
+  <h3 style="margin-bottom:1rem">Augšupielādēt fotogrāfijas</h3>
+  <form method="POST" action="/admin/gallery/upload" enctype="multipart/form-data">
+    <div class="grid-2" style="gap:1rem">
+      <div class="form-group">
+        <label class="form-label">Fotogrāfijas</label>
+        <input type="file" name="photos" class="form-control" multiple accept="image/*" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Albums</label>
+        <input type="text" name="album" class="form-control" placeholder="piemēram, Jāņi 2025">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Piesaistīt pasākumam</label>
+        <select name="event_id" class="form-control">
+          <option value="">— Nav —</option>
+          {% for e in events_list %}
+          <option value="{{ e.id }}">{{ e.event_date }} — {{ e.title }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form-group" style="display:flex;align-items:flex-end">
+        <label class="form-check">
+          <input type="checkbox" name="is_public" checked> Publiski redzams
+        </label>
+      </div>
+    </div>
+    <button type="submit" class="btn btn-primary">Augšupielādēt</button>
+  </form>
+</div>
+
+<!-- Photos table -->
+<div class="table-responsive">
+  <table class="table">
+    <thead>
+      <tr><th>Foto</th><th>Albums</th><th>Pasākums</th><th>Datums</th><th>Publisks</th><th>Darbības</th></tr>
+    </thead>
+    <tbody>
+      {% for photo in photos %}
+      <tr>
+        <td>
+          <img src="/static/uploads/photos/{{ photo.filename }}" alt="" style="width:60px;height:45px;object-fit:cover;border-radius:4px">
+        </td>
+        <td>
+          <form method="POST" action="/admin/gallery/{{ photo.id }}/edit" style="display:flex;gap:.25rem;align-items:center">
+            <input type="text" name="album" value="{{ photo.album or '' }}" class="form-control" style="max-width:120px;padding:.3rem .5rem;font-size:.82rem">
+            <input type="text" name="caption" value="{{ photo.caption or '' }}" class="form-control" style="max-width:180px;padding:.3rem .5rem;font-size:.82rem" placeholder="Apraksts">
+            <select name="event_id" class="form-control" style="max-width:150px;padding:.3rem .5rem;font-size:.82rem">
+              <option value="">—</option>
+              {% for e in events_list %}
+              <option value="{{ e.id }}" {% if photo.event_id == e.id %}selected{% endif %}>{{ e.title[:25] }}</option>
+              {% endfor %}
+            </select>
+            <input type="hidden" name="is_public" value="{{ photo.is_public }}">
+            <input type="hidden" name="sort_order" value="{{ photo.sort_order }}">
+            <button type="submit" class="btn btn-sm btn-ghost">💾</button>
+          </form>
+        </td>
+        <td style="font-size:.82rem">{{ photo.event_title or '—' }}</td>
+        <td style="font-size:.82rem">{{ photo.taken_date or '—' }}</td>
+        <td>
+          <form method="POST" action="/admin/gallery/{{ photo.id }}/edit">
+            <input type="hidden" name="album" value="{{ photo.album or '' }}">
+            <input type="hidden" name="caption" value="{{ photo.caption or '' }}">
+            <input type="hidden" name="event_id" value="{{ photo.event_id or '' }}">
+            <input type="hidden" name="is_public" value="{{ '0' if photo.is_public else '1' }}">
+            <input type="hidden" name="sort_order" value="{{ photo.sort_order }}">
+            <button type="submit" class="btn btn-sm {{ 'btn-primary' if photo.is_public else 'btn-ghost' }}" title="Mainīt">
+              {{ '✅' if photo.is_public else '🔒' }}
+            </button>
+          </form>
+        </td>
+        <td>
+          <form method="POST" action="/admin/gallery/{{ photo.id }}/delete" onsubmit="return confirm('Dzēst foto?')">
+            <button type="submit" class="btn btn-sm btn-danger">Dzēst</button>
+          </form>
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="6" class="text-muted" style="text-align:center;padding:2rem">Galerija ir tukša.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

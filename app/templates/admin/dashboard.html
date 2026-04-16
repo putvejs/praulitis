@@ -1,0 +1,60 @@
+{% extends "admin/base.html" %}
+{% block title %}Admin — Praulītis{% endblock %}
+
+{% block admin_content %}
+<div class="admin-header">
+  <h1>Kopsavilkums</h1>
+  <a href="/" target="_blank" class="btn btn-sm btn-ghost">Skatīt lapu →</a>
+</div>
+
+<div class="stat-grid">
+  <div class="stat-card">
+    <div class="stat-number">{{ stats.events }}</div>
+    <div class="stat-label">Pasākumi</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number">{{ stats.photos }}</div>
+    <div class="stat-label">Fotogrāfijas</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number">{{ stats.members }}</div>
+    <div class="stat-label">Dalībnieki</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number">{{ stats.media }}</div>
+    <div class="stat-label">Mediji</div>
+  </div>
+  {% if stats.pending_photos > 0 %}
+  <div class="stat-card" style="border-top-color:var(--red-dark)">
+    <div class="stat-number" style="color:var(--red-dark)">{{ stats.pending_photos }}</div>
+    <div class="stat-label">Foto neapstiprināti</div>
+  </div>
+  {% endif %}
+</div>
+
+<div class="grid-2" style="gap:1.5rem">
+  <div class="card card-body">
+    <h3 style="margin-bottom:1rem">Ātrās saites</h3>
+    <div style="display:flex;flex-direction:column;gap:.5rem">
+      <a href="/admin/events/new" class="btn btn-primary">+ Jauns pasākums</a>
+      <a href="/admin/gallery" class="btn btn-ghost">Augšupielādēt foto</a>
+      <a href="/admin/announcements/new" class="btn btn-ghost" onclick="document.getElementById('new-ann-form').scrollIntoView()">+ Paziņojums</a>
+    </div>
+  </div>
+  <div class="card card-body">
+    <h3 style="margin-bottom:1rem">Ātrais paziņojums</h3>
+    <form method="POST" action="/admin/announcements/new">
+      <div class="form-group">
+        <input type="text" name="title" class="form-control" placeholder="Virsraksts" required>
+      </div>
+      <div class="form-group">
+        <textarea name="body" class="form-control" rows="3" placeholder="Teksts…" required></textarea>
+      </div>
+      <div style="display:flex;gap:.5rem;align-items:center">
+        <label class="form-check"><input type="checkbox" name="is_pinned"> Piespraust</label>
+        <button type="submit" class="btn btn-primary btn-sm" style="margin-left:auto">Publicēt</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

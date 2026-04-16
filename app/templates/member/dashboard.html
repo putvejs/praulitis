@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block title %}Dalībnieki — Praulītis{% endblock %}
+
+{% block content %}
+<section class="section" style="padding-top:2rem">
+  <div class="container" style="max-width:900px">
+    <h1>Sveiks, {{ session.username }}! 👋</h1>
+
+    {% if pinned %}
+    <div style="margin-top:1.5rem">
+      {% for ann in pinned %}
+      <div class="card card-body" style="border-left:4px solid var(--amber);margin-bottom:1rem">
+        <div style="display:flex;justify-content:space-between;align-items:start;gap:.5rem">
+          <h3 style="margin-bottom:.35rem">📌 {{ ann.title }}</h3>
+          <span style="font-size:.75rem;color:var(--ink-light);flex-shrink:0">{{ ann.created_at[:10] }}</span>
+        </div>
+        <p style="white-space:pre-line;margin:0">{{ ann.body }}</p>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="grid-2" style="margin-top:2rem;gap:1.5rem">
+      <!-- Upcoming rehearsals -->
+      <div class="card card-body">
+        <h2 style="font-size:1.2rem;margin-bottom:1rem">📅 Nākamie mēģinājumi</h2>
+        {% if schedule %}
+        <div style="display:flex;flex-direction:column;gap:.5rem">
+          {% for s in schedule[:6] %}
+          <div style="display:flex;gap:.75rem;align-items:start;padding:.5rem;border-radius:var(--radius);background:{{ 'var(--cream-dark)' if loop.index == 1 else 'transparent' }};{% if s.cancelled %}opacity:.5;text-decoration:line-through;{% endif %}">
+            <span style="font-weight:bold;color:var(--green-dark);min-width:80px;font-size:.88rem">{{ s.date.strftime('%d.%m') }}</span>
+            <span style="font-size:.88rem;color:var(--ink-mid)">{{ s.day_name[:3] }}</span>
+            <span style="font-size:.88rem;color:var(--amber)">{{ s.time }}</span>
+            <span style="font-size:.82rem;color:var(--ink-light);flex:1">{{ s.location }}</span>
+            {% if s.note %}<span style="font-size:.78rem;color:var(--ink-light);font-style:italic">{{ s.note }}</span>{% endif %}
+          </div>
+          {% endfor %}
+        </div>
+        <div class="mt-2">
+          <a href="/member/schedule" class="btn btn-sm btn-ghost">Pilns saraksts →</a>
+        </div>
+        {% else %}
+        <p class="text-muted">Nav plānotu mēģinājumu.</p>
+        {% endif %}
+      </div>
+
+      <!-- Recent announcements -->
+      <div class="card card-body">
+        <h2 style="font-size:1.2rem;margin-bottom:1rem">📢 Paziņojumi</h2>
+        {% if recent %}
+        <div style="display:flex;flex-direction:column;gap:.75rem">
+          {% for ann in recent %}
+          <div>
+            <div style="display:flex;justify-content:space-between;gap:.5rem">
+              <strong style="font-size:.9rem">{{ ann.title }}</strong>
+              <span style="font-size:.75rem;color:var(--ink-light);flex-shrink:0">{{ ann.created_at[:10] }}</span>
+            </div>
+            <p style="font-size:.85rem;color:var(--ink-mid);margin:.25rem 0 0;white-space:pre-line">{{ ann.body[:150] }}{% if ann.body|length > 150 %}…{% endif %}</p>
+          </div>
+          {% endfor %}
+        </div>
+        <div class="mt-2">
+          <a href="/member/announcements" class="btn btn-sm btn-ghost">Visi paziņojumi →</a>
+        </div>
+        {% else %}
+        <p class="text-muted">Nav jaunu paziņojumu.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

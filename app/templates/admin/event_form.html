@@ -1,0 +1,63 @@
+{% extends "admin/base.html" %}
+{% block title %}{{ 'Rediģēt' if event else 'Jauns' }} pasākums — Admin{% endblock %}
+
+{% block admin_content %}
+<div class="admin-header">
+  <h1>{{ 'Rediģēt pasākumu' if event else 'Jauns pasākums' }}</h1>
+  <a href="/admin/events" class="btn btn-ghost btn-sm">← Atpakaļ</a>
+</div>
+
+<div class="card card-body" style="max-width:700px">
+  <form method="POST">
+    <div class="grid-2" style="gap:1rem">
+      <div class="form-group" style="grid-column:1/-1">
+        <label class="form-label">Nosaukums *</label>
+        <input type="text" name="title" class="form-control" value="{{ event.title if event else '' }}" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Datums *</label>
+        <input type="date" name="event_date" class="form-control" value="{{ event.event_date if event else '' }}" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Laiks</label>
+        <input type="time" name="event_time" class="form-control" value="{{ event.event_time if event else '' }}">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Beigu datums (daudzdienu)</label>
+        <input type="date" name="end_date" class="form-control" value="{{ event.end_date if event else '' }}">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Veids</label>
+        <select name="event_type" class="form-control">
+          {% for t in ['concert','festival','rehearsal','workshop'] %}
+          <option value="{{ t }}" {% if event and event.event_type == t %}selected{% endif %}>{{ t }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form-group" style="grid-column:1/-1">
+        <label class="form-label">Vieta</label>
+        <input type="text" name="location" class="form-control" value="{{ event.location if event else '' }}" placeholder="piemēram, Lēdurga, Cēsis">
+      </div>
+      <div class="form-group" style="grid-column:1/-1">
+        <label class="form-label">Apraksts</label>
+        <textarea name="description" class="form-control" rows="6">{{ event.description if event else '' }}</textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">URL atslēga (slug)</label>
+        <input type="text" name="slug" class="form-control" value="{{ event.slug if event else '' }}" placeholder="auto-ģenerēts no nosaukuma">
+        <div class="form-hint">Atstāj tukšu — tiks ģenerēts automātiski</div>
+      </div>
+      <div class="form-group" style="display:flex;align-items:center;gap:.75rem">
+        <label class="form-check">
+          <input type="checkbox" name="is_public" {% if not event or event.is_public %}checked{% endif %}>
+          Publisks (redzams vietnē)
+        </label>
+      </div>
+    </div>
+    <div style="display:flex;gap:.75rem;margin-top:1rem">
+      <button type="submit" class="btn btn-primary">Saglabāt</button>
+      <a href="/admin/events" class="btn btn-ghost">Atcelt</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

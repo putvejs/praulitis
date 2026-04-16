@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+{% block title %}Folkloras kopa "Praulītis" — Prauliena{% endblock %}
+
+{% block content %}
+<!-- ─── Hero ─── -->
+<section class="hero">
+  <div class="hero-bg-pattern"></div>
+  <div class="hero-text fade-in visible">
+    <div class="hero-eyebrow">Folkloras kopa</div>
+    <h1 class="hero-title">Folkloras kopa<br><em>Praulītis</em></h1>
+    <p class="hero-subtitle">Prauliena · Madonas novads · Latvija</p>
+    <p class="hero-desc">{{ intro }}</p>
+    <div class="hero-cta">
+      <a href="/events" class="btn-primary">Pasākumi</a>
+      <a href="/about" class="btn-outline">Par mums</a>
+    </div>
+  </div>
+  <div class="hero-visual">
+    <div class="hero-image-frame">
+      <div class="hero-image-placeholder">
+        <div class="folk-ornament">✦</div>
+      </div>
+      <div class="hero-caption">
+        <p>"Dziedām dziesmas, ko dziedāja mūsu vecmāmiņas"</p>
+        <span>Prauliena · Madonas novads</span>
+      </div>
+    </div>
+  </div>
+  <div class="scroll-hint">Ritināt</div>
+</section>
+
+<!-- ─── Search bar ─── -->
+<section class="section" style="padding:2rem 4vw 1rem">
+  <div class="search-bar">
+    <input type="text" id="live-search" class="search-input" placeholder="Meklēt pasākumus, fotus…" autocomplete="off">
+    <button class="btn btn-primary" onclick="document.querySelector('form[action=\'/search\']') && document.querySelector('form[action=\'/search\']').submit()">→</button>
+    <div id="live-results" class="search-results-live hidden"></div>
+  </div>
+</section>
+
+<!-- ─── Upcoming events ─── -->
+{% if next_events %}
+<section class="events-section">
+  <div class="section-header">
+    <div>
+      <div class="section-label">Koncerti un svētki</div>
+      <h2 class="section-title">Gaidāmie <em>pasākumi</em></h2>
+    </div>
+    <div class="section-count">{{ '%02d'|format(next_events|length) }}</div>
+  </div>
+  <div class="events-list">
+    {% for e in next_events %}
+    {% set parts = e.event_date.split('-') %}
+    {% set months = ['Jan','Feb','Mar','Apr','Mai','Jūn','Jūl','Aug','Sep','Okt','Nov','Dec'] %}
+    <a href="/events/{{ e.slug }}" class="event-row fade-in">
+      <div class="event-date">
+        <div class="event-day">{{ parts[2] }}</div>
+        <div class="event-month">{{ months[parts[1]|int - 1] }} {{ parts[0] }}</div>
+      </div>
+      <div class="event-info">
+        <div class="event-title">{{ e.title }}</div>
+        {% if e.location %}
+        <div class="event-location">{{ e.location }}</div>
+        {% endif %}
+      </div>
+      <span class="event-ticket-btn">Uzzināt vairāk →</span>
+    </a>
+    {% endfor %}
+  </div>
+  <div style="text-align:center;margin-top:32px">
+    <a href="/events" class="btn-outline" style="color:var(--amber-light);border-color:rgba(233,168,58,.3)">Visi pasākumi →</a>
+  </div>
+</section>
+{% endif %}
+
+<!-- ─── Recent photos gallery ─── -->
+{% if recent_photos %}
+<section class="gallery-section">
+  <div class="section-header">
+    <div>
+      <div class="section-label">Fotogrāfijas</div>
+      <h2 class="section-title">Jaunākās <em>fotogrāfijas</em></h2>
+    </div>
+    <div class="section-count">{{ '%02d'|format(recent_photos|length) }}</div>
+  </div>
+  <div class="gallery-grid">
+    {% set spans = ['span-6','span-3','span-3','span-4','span-8','span-4'] %}
+    {% for photo in recent_photos %}
+    <div class="gallery-item {{ spans[loop.index0 % spans|length] }} fade-in"
+         data-src="/static/uploads/photos/{{ photo.filename }}"
+         data-caption="{{ photo.caption or '' }}">
+      <img src="/static/uploads/photos/{{ photo.filename }}" alt="{{ photo.caption or 'Foto' }}" loading="lazy">
+      <div class="gallery-overlay"><span>Apskatīt</span></div>
+    </div>
+    {% endfor %}
+  </div>
+  <div style="text-align:center;margin-top:32px">
+    <a href="/gallery" class="btn-outline-dark">Visa galerija →</a>
+  </div>
+</section>
+{% endif %}
+
+<!-- ─── About teaser ─── -->
+<section class="section section-dark" style="padding:96px 4vw">
+  <div style="max-width:700px;text-align:center;margin:0 auto">
+    <h2 style="font-family:'Cormorant Garamond',serif;font-size:clamp(32px,4vw,48px);font-weight:300;color:var(--amber-pale);margin-bottom:16px">
+      Tradīcija. Mūzika. <em style="color:var(--amber-light)">Kopiena.</em>
+    </h2>
+    <p style="font-size:15px;line-height:1.8;color:rgba(245,232,200,.7);margin-bottom:40px">
+      Mēs esam Praulienas folkloras kopa, kas kopj senās dziedāšanas tradīcijas — no ikdienas dziesmu dziedāšanas mēģinājumos līdz uzstāšanās svētkos visā Latvijā.
+    </p>
+    <a href="/about" class="btn-outline">Uzzināt vairāk</a>
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const items = Array.from(document.querySelectorAll('.gallery-item[data-src]')).map(el => ({
+      src: el.dataset.src,
+      caption: el.dataset.caption
+    }));
+    if (items.length && typeof initGallery === 'function') {
+      initGallery(items);
+    }
+  });
+</script>
+{% endblock %}

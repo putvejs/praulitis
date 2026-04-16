@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="60" height="20" viewBox="0 0 60 20">
+  <rect width="60" height="20" fill="none"/>
+  <!-- Latvian geometric border pattern: central diamond with cross arms -->
+  <g fill="#C8882A">
+    <!-- Central diamond -->
+    <polygon points="30,4 34,10 30,16 26,10"/>
+    <!-- Cross arms -->
+    <rect x="18" y="9" width="8" height="2"/>
+    <rect x="34" y="9" width="8" height="2"/>
+    <!-- Side dots -->
+    <rect x="10" y="9" width="4" height="2"/>
+    <rect x="46" y="9" width="4" height="2"/>
+    <!-- Corner marks -->
+    <rect x="2" y="8" width="3" height="4" rx="1"/>
+    <rect x="55" y="8" width="3" height="4" rx="1"/>
+    <!-- Small diamonds flanking -->
+    <polygon points="20,7 22,10 20,13 18,10"/>
+    <polygon points="40,7 42,10 40,13 38,10"/>
+  </g>
+</svg>

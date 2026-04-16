@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Ieiet — Praulītis{% endblock %}
+{% block content %}
+<div class="login-wrapper">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="logo-main">🌿 Praulītis</div>
+      <div class="logo-sub">Folkloras kopa</div>
+    </div>
+    {% if error %}
+      <div class="flash error" style="margin-bottom:1rem">{{ error }}</div>
+    {% endif %}
+    <form method="POST" action="/login">
+      <input type="hidden" name="next" value="{{ next }}">
+      <div class="form-group">
+        <label class="form-label" for="username">Lietotājvārds</label>
+        <input class="form-control" type="text" id="username" name="username" required autofocus autocomplete="username">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="password">Parole</label>
+        <input class="form-control" type="password" id="password" name="password" required autocomplete="current-password">
+      </div>
+      <button type="submit" class="btn btn-primary" style="width:100%">Ieiet</button>
+    </form>
+    <p style="margin-top:1.5rem;text-align:center;font-size:.85rem;color:var(--ink-light)">
+      <a href="/">← Atpakaļ uz sākumu</a>
+    </p>
+  </div>
+</div>
+{% endblock %}

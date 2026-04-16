@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block body_class %}admin-page{% endblock %}
+
+{% block content %}
+<div class="admin-layout">
+  <aside class="admin-sidebar">
+    <div style="padding:1rem 1.5rem;border-bottom:1px solid rgba(255,255,255,.08);margin-bottom:.5rem">
+      <div style="color:var(--amber-light);font-size:.85rem;font-weight:bold">⚙ Admin</div>
+      <div style="color:var(--ink-light);font-size:.75rem">{{ session.username }}</div>
+    </div>
+    <nav>
+      <div class="sidebar-section">Saturs</div>
+      <a href="/admin" class="{{ 'active' if request.path == '/admin' }}">📊 Kopsavilkums</a>
+      <a href="/admin/events" class="{{ 'active' if '/admin/events' in request.path }}">📅 Pasākumi</a>
+      <a href="/admin/gallery" class="{{ 'active' if '/admin/gallery' in request.path }}">🖼 Galerija</a>
+      <a href="/admin/media" class="{{ 'active' if '/admin/media' in request.path }}">🎬 Mediji</a>
+      <a href="/admin/members" class="{{ 'active' if '/admin/members' in request.path }}">👥 Dalībnieki</a>
+      <a href="/admin/content" class="{{ 'active' if '/admin/content' in request.path }}">✏ Teksts</a>
+      <div class="sidebar-section" style="margin-top:.5rem">Dalībnieki</div>
+      <a href="/admin/announcements" class="{{ 'active' if '/admin/announcements' in request.path }}">📢 Paziņojumi</a>
+      <a href="/admin/schedule" class="{{ 'active' if '/admin/schedule' in request.path }}">🗓 Mēģinājumi</a>
+      <div class="sidebar-section" style="margin-top:.5rem">—</div>
+      <a href="/" target="_blank">🌐 Skatīt lapu</a>
+      <a href="/logout">← Iziet</a>
+    </nav>
+  </aside>
+  <div class="admin-content">
+    {% block admin_content %}{% endblock %}
+  </div>
+</div>
+{% endblock %}

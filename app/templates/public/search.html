@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}Meklēšana — Praulītis{% endblock %}
+
+{% block content %}
+<section class="section" style="padding-top:2rem">
+  <div class="container" style="max-width:800px">
+    <h1 style="margin-bottom:1.5rem">Meklēšana</h1>
+    <form method="GET" action="/search" style="margin-bottom:2rem">
+      <div class="search-bar" style="margin:0">
+        <input type="text" name="q" id="live-search" class="search-input" value="{{ q }}" placeholder="Meklēt pasākumus, fotus…" autofocus autocomplete="off">
+        <button type="submit" class="btn btn-primary">Meklēt</button>
+        <div id="live-results" class="search-results-live hidden"></div>
+      </div>
+    </form>
+
+    {% if q %}
+      {% if results %}
+        <p class="text-muted" style="margin-bottom:1.5rem">Atrasti {{ results|length }} rezultāti vaicājumam "<strong>{{ q }}</strong>"</p>
+        {% set events = results | selectattr('type','eq','event') | list %}
+        {% set photos = results | selectattr('type','eq','photo') | list %}
+
+        {% if events %}
+        <h2 style="margin-bottom:1rem;font-size:1.1rem">Pasākumi ({{ events|length }})</h2>
+        <div style="display:flex;flex-direction:column;gap:.75rem;margin-bottom:2rem">
+          {% for e in events %}
+          {% set parts = e.event_date.split('-') %}
+          <div class="event-card">
+            <div class="event-date-block">
+              <span class="day">{{ parts[2] }}</span>
+              <span class="month">{{ parts[1] }}</span>
+              <span class="year">{{ parts[0] }}</span>
+            </div>
+            <div class="event-info">
+              <h3><a href="/events/{{ e.slug }}">{{ e.title }}</a></h3>
+              <div class="event-meta">
+                {% if e.location %}<span>📍 {{ e.location }}</span>{% endif %}
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if photos %}
+        <h2 style="margin-bottom:1rem;font-size:1.1rem">Fotogrāfijas ({{ photos|length }})</h2>
+        <div class="photo-grid">
+          {% for p in photos %}
+          <div class="photo-item" data-src="/static/uploads/photos/{{ p.filename }}" data-caption="{{ p.title or '' }}">
+            <img src="/static/uploads/photos/{{ p.filename }}" alt="{{ p.title or 'Foto' }}" loading="lazy">
+            <div class="photo-overlay">
+              {% if p.title %}<span>{{ p.title }}</span>{% endif %}
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+      {% else %}
+        <p class="text-muted">Nav rezultātu vaicājumam "<strong>{{ q }}</strong>".</p>
+      {% endif %}
+    {% endif %}
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const items = Array.from(document.querySelectorAll('.photo-item')).map(el => ({
+      src: el.dataset.src, caption: el.dataset.caption
+    }));
+    if (typeof initGallery === 'function') initGallery(items);
+  });
+</script>
+{% endblock %}

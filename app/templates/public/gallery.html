@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% block title %}Galerija — Praulītis{% endblock %}
+
+{% block content %}
+<!-- ─── Albums ─── -->
+{% if albums %}
+<section class="gallery-section">
+  <div class="section-header">
+    <div>
+      <div class="section-label">Fotogrāfijas</div>
+      <h2 class="section-title">Foto <em>galerija</em></h2>
+    </div>
+    <div class="section-count">{{ '%02d'|format(albums|length) }}</div>
+  </div>
+  <div class="grid-3">
+    {% for album in albums %}
+    {% set album_url = album.album | urlencode %}
+    <a href="/gallery/{{ album_url }}" class="card" style="text-decoration:none;color:inherit">
+      {% if album.cover_filename %}
+      <img class="card-img" src="/static/uploads/photos/{{ album.cover_filename }}" alt="{{ album.album }}" loading="lazy">
+      {% else %}
+      <div class="card-img" style="background:linear-gradient(135deg,var(--forest-mid),var(--forest));display:flex;align-items:center;justify-content:center;font-size:3rem;color:rgba(245,232,200,.2)">✦</div>
+      {% endif %}
+      <div class="card-body">
+        <div class="card-title">{{ album.album }}</div>
+        <div class="card-meta">
+          <span>{{ album.photo_count }} foto</span>
+          {% if album.latest_date %}<span>{{ album.latest_date }}</span>{% endif %}
+        </div>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+<!-- ─── Ungrouped photos ─── -->
+{% if ungrouped %}
+<section class="section" style="padding:80px 4vw;background:var(--white)">
+  {% if albums %}
+  <div class="section-header">
+    <div>
+      <div class="section-label">Jaunākās</div>
+      <h2 class="section-title">Jaunākās <em>fotogrāfijas</em></h2>
+    </div>
+    <div class="section-count">{{ '%02d'|format(ungrouped|length) }}</div>
+  </div>
+  {% else %}
+  <div class="section-header">
+    <div>
+      <div class="section-label">Fotogrāfijas</div>
+      <h2 class="section-title">Foto <em>galerija</em></h2>
+    </div>
+    <div class="section-count">{{ '%02d'|format(ungrouped|length) }}</div>
+  </div>
+  {% endif %}
+  <div class="photo-grid">
+    {% for photo in ungrouped %}
+    <div class="photo-item" data-src="/static/uploads/photos/{{ photo.filename }}" data-caption="{{ photo.caption or '' }}">
+      <img src="/static/uploads/photos/{{ photo.filename }}" alt="{{ photo.caption or 'Foto' }}" loading="lazy">
+      <div class="photo-overlay">
+        {% if photo.caption %}<span>{{ photo.caption }}</span>{% endif %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+{% if not albums and not ungrouped %}
+<section class="section" style="padding:120px 4vw;text-align:center">
+  <p style="font-size:15px;color:var(--stone)">Galerija ir tukša.</p>
+</section>
+{% endif %}
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const items = Array.from(document.querySelectorAll('.photo-item')).map(el => ({
+      src: el.dataset.src, caption: el.dataset.caption
+    }));
+    if (typeof initGallery === 'function') initGallery(items);
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block title %}Par mums — Praulītis{% endblock %}
+
+{% block content %}
+<!-- ─── Hero ─── -->
+<section class="hero" style="min-height:40vh;grid-template-columns:1fr">
+  <div class="hero-bg-pattern"></div>
+  <div class="hero-text fade-in visible" style="padding:60px 8vw">
+    <div class="hero-eyebrow">Folkloras kopa</div>
+    <h1 class="hero-title">Par <em>mums</em></h1>
+    <p class="hero-subtitle">Prauliena · Madonas novads · Latvija</p>
+  </div>
+</section>
+
+<!-- ─── History text ─── -->
+<section class="section" style="padding:80px 4vw">
+  <div class="container-narrow">
+    <div class="lead" style="white-space:pre-line;color:var(--charcoal-mid);line-height:1.9">{{ history }}</div>
+  </div>
+</section>
+
+<!-- ─── Members ─── -->
+{% if members %}
+<section class="members-section">
+  <div class="section-header">
+    <div>
+      <div class="section-label">Ansamblis</div>
+      <h2 class="section-title">Kopas <em>dalībnieki</em></h2>
+    </div>
+    <div class="section-count">{{ '%02d'|format(members|length) }}</div>
+  </div>
+  <div class="members-grid">
+    {% for m in members %}
+    <div class="member-card fade-in">
+      <div class="member-photo">
+        {% if m.photo_filename %}
+        <img src="/static/uploads/photos/{{ m.photo_filename }}" alt="{{ m.name }}">
+        {% else %}
+        <div class="member-photo-placeholder">
+          <span class="member-initials">
+            {%- set words = m.name.split() -%}
+            {{ words[0][0] }}{% if words|length > 1 %}{{ words[-1][0] }}{% endif %}
+          </span>
+        </div>
+        {% endif %}
+        {% if m.role %}
+        <div class="member-instrument-badge">{{ m.role.split('·')[0].strip() if '·' in m.role else m.role }}</div>
+        {% endif %}
+      </div>
+      <div class="member-info">
+        <div class="member-name">{{ m.name }}</div>
+        {% if m.role %}<div class="member-role">{{ m.role }}</div>{% endif %}
+        {% if m.bio %}<div class="member-bio">{{ m.bio }}</div>{% endif %}
+        {% if m.joined_year %}<div style="font-size:.75rem;color:var(--stone);margin-top:4px">kopš {{ m.joined_year }}</div>{% endif %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+<!-- ─── Join teaser ─── -->
+<section class="section section-dark" style="padding:96px 4vw">
+  <div style="max-width:700px;text-align:center;margin:0 auto">
+    <h2 style="font-family:'Cormorant Garamond',serif;font-size:clamp(32px,4vw,48px);font-weight:300;color:var(--amber-pale);margin-bottom:16px">
+      Pievienojies
+    </h2>
+    <p style="font-size:15px;line-height:1.8;color:rgba(245,232,200,.7);margin-bottom:40px">
+      Ja tevi interesē latvju tautas tradīcijas un vēlies dziedāt kopā ar mums, laipni lūdzam!
+      Mēģinājumi notiek regulāri — sīkāk
+      <a href="/member/schedule" style="color:var(--amber-light)">mēģinājumu sarakstā</a>.
+    </p>
+    <a href="/member/schedule" class="btn-outline">Mēģinājumu grafiks</a>
+  </div>
+</section>
+{% endblock %}

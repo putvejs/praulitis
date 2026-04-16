@@ -1,0 +1,51 @@
+{% extends "admin/base.html" %}
+{% block title %}{{ 'Rediģēt' if member else 'Jauns' }} dalībnieks — Admin{% endblock %}
+
+{% block admin_content %}
+<div class="admin-header">
+  <h1>{{ 'Rediģēt dalībnieku' if member else 'Jauns dalībnieks' }}</h1>
+  <a href="/admin/members" class="btn btn-ghost btn-sm">← Atpakaļ</a>
+</div>
+<div class="card card-body" style="max-width:600px">
+  <form method="POST" enctype="multipart/form-data">
+    <div class="form-group">
+      <label class="form-label">Vārds *</label>
+      <input type="text" name="name" class="form-control" value="{{ member.name if member else '' }}" required>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Loma / instruments</label>
+      <input type="text" name="role" class="form-control" value="{{ member.role if member else '' }}" placeholder="piemēram, dziedātāja, kokle">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Biogrāfija</label>
+      <textarea name="bio" class="form-control" rows="4">{{ member.bio if member else '' }}</textarea>
+    </div>
+    <div class="grid-2" style="gap:1rem">
+      <div class="form-group">
+        <label class="form-label">Foto</label>
+        <input type="file" name="photo" class="form-control" accept="image/*">
+        {% if member and member.photo_filename %}
+        <img src="/static/uploads/photos/{{ member.photo_filename }}" style="width:80px;height:80px;border-radius:50%;object-fit:cover;margin-top:.5rem">
+        {% endif %}
+      </div>
+      <div>
+        <div class="form-group">
+          <label class="form-label">Pievienojās gadā</label>
+          <input type="number" name="joined_year" class="form-control" value="{{ member.joined_year if member else '' }}" min="1990" max="2030">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Kārtošanas nr.</label>
+          <input type="number" name="sort_order" class="form-control" value="{{ member.sort_order if member else 0 }}">
+        </div>
+        <label class="form-check">
+          <input type="checkbox" name="is_active" {% if not member or member.is_active %}checked{% endif %}> Aktīvs dalībnieks
+        </label>
+      </div>
+    </div>
+    <div style="display:flex;gap:.75rem;margin-top:1.25rem">
+      <button type="submit" class="btn btn-primary">Saglabāt</button>
+      <a href="/admin/members" class="btn btn-ghost">Atcelt</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,18 @@
+{% extends "admin/base.html" %}
+{% block title %}Teksta bloki — Admin{% endblock %}
+
+{% block admin_content %}
+<div class="admin-header"><h1>Rediģēt tekstu</h1></div>
+<div class="card card-body" style="max-width:800px">
+  <form method="POST">
+    {% for block in blocks %}
+    <div class="form-group">
+      <label class="form-label">{{ block.key }}</label>
+      <textarea name="block_{{ block.key }}" class="form-control" rows="5">{{ block.content }}</textarea>
+      {% if block.updated_at %}<div class="form-hint">Pēdējo reizi mainīts: {{ block.updated_at[:16] }}</div>{% endif %}
+    </div>
+    {% endfor %}
+    <button type="submit" class="btn btn-primary">Saglabāt visu</button>
+  </form>
+</div>
+{% endblock %}
